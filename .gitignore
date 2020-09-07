@@ -1,0 +1,89 @@
+
+# Created by https://www.toptal.com/developers/gitignore/api/xilinxise,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=xilinxise,visualstudiocode
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+
+### XilinxISE ###
+# intermediate build files
+*.bgn
+*.bit
+*.bld
+*.cmd_log
+*.drc
+*.ll
+*.lso
+*.msd
+*.msk
+*.ncd
+*.ngc
+*.ngd
+*.ngr
+*.pad
+*.par
+*.pcf
+*.ptwx
+*.rbb
+*.rbd
+*.stx
+*.syr
+*.twr
+*.twx
+*.unroutes
+*.ut
+*.xpi
+*.xst
+*.xwbt
+*.map
+*.mrp
+*.ngm
+*.xrpt
+*.csv
+*.xrpt
+*.log
+*.cmd
+*.dll
+*.html
+*.xml
+*.xsl
+*.xwbt
+*.gise
+*.exe
+*.wdb
+*.ini
+*.dbg
+*.dat
+*.prj
+*.stx
+*.xst
+*.xmsgs
+*.xise
+*.lso
+*.syr
+*.xrpt
+*.ngc
+*.ngr
+*.cmd_log
+*.ngd
+*.bld
+*.txt
+
+# generated folders
+isim/
+iseconfig/
+xlnx_auto_0_xdb/
+xst/
+_ngo/
+_xmsgs/
+
+# End of https://www.toptal.com/developers/gitignore/api/xilinxise,visualstudiocode

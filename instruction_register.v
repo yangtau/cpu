@@ -19,10 +19,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module instruction_register(
-           if_pc4,if_inst,clk,clrn,id_pc4,id_inst
+           if_pc4,if_inst,clk,clrn,
+           wir,
+           id_pc4,id_inst
        );
 input [31:0] if_pc4, if_inst;
-input clk, clrn;
+input clk, clrn, wir; // wir 写 IR 控制
 output [31:0] id_pc4,id_inst;
 
 reg [31:0] id_pc4,id_inst;
@@ -35,7 +37,7 @@ always @(posedge clk or negedge clrn) begin
         id_pc4 <= 0;
         id_inst <= 0;
     end
-    else begin
+    else if (wir==1) begin
         id_pc4 <= if_pc4;
         id_inst <= if_inst;
     end

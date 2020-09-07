@@ -42,28 +42,36 @@ wire id_wz, exe_wz;
 wire id_wreg, exe_wreg, mem_wreg, wb_wreg;
 wire [4:0] id_rn, exe_rn, mem_rn, wb_rn;
 wire [31:0] mem_mo, wb_mo;
+wire stall; // stall
 
 
-program_counter PCR (Clock, Resetn, npc, PC);
+program_counter PCR (Clock, Resetn, npc,
+                     ~stall, // wpc
+                     PC);
 
 instruction_fetch IF_STAGE (
-                      pcsource, PC, bpc, jpc, if_pc4, npc, IF_Inst);
+                      pcsource, PC, bpc, jpc, if_pc4, npc,
+                      IF_Inst);
 
 instruction_register IR(
-                         if_pc4, IF_Inst, Clock, Resetn, id_pc4, ID_Inst);
+                         if_pc4, IF_Inst, Clock, Resetn,
+                         ~stall, // wir
+                         id_pc4, ID_Inst);
 
 instruction_decode ID_STAGE (id_pc4, ID_Inst, wdi, Clock, Resetn, bpc, jpc, pcsource,
                              id_m2reg, id_wmem, id_aluc, id_aluimm, id_a, id_b, id_imm,
+                             exe_rn, mem_rn, exe_wreg, mem_wreg, stall,
                              id_shift, mem_z , id_wreg, wb_wreg, id_rn, wb_rn, id_wz);
 
 id_exe_register ID_EXE (.clk(Clock), .clrn(Resetn),
-                        .id_wreg(id_wreg), .id_m2reg(id_m2reg), 
+                        .lock_write(stall),
+                        .id_wreg(id_wreg), .id_m2reg(id_m2reg),
                         .id_wmem(id_wmem), .id_aluc(id_aluc), .id_aluimm(id_aluimm),
-                        .id_a(id_a), .id_b(id_b), .id_imm(id_imm), .id_rn(id_rn), 
+                        .id_a(id_a), .id_b(id_b), .id_imm(id_imm), .id_rn(id_rn),
                         .id_shift(id_shift), .id_wz(id_wz),
-                        .exe_wreg(exe_wreg), .exe_m2reg(exe_m2reg), 
+                        .exe_wreg(exe_wreg), .exe_m2reg(exe_m2reg),
                         .exe_wmem(exe_wmem), .exe_aluc(exe_aluc), .exe_aluimm(exe_aluimm),
-                        .exe_a(exe_a), .exe_b(exe_b), .exe_imm(exe_imm), 
+                        .exe_a(exe_a), .exe_b(exe_b), .exe_imm(exe_imm),
                         .exe_rn(exe_rn), .exe_shift(exe_shift), .exe_wz(exe_wz));
 
 execute EXE_STAGE (exe_aluc, exe_aluimm, exe_a, exe_b, exe_imm, exe_shift, EXE_Alu, exe_z);

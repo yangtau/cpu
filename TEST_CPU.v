@@ -50,7 +50,7 @@ PPCPU uut (
 
 initial begin
     // Initialize Inputs
-    Clock = 0;
+    Clock = 1;
     Resetn = 0;
 
     // Wait 100 ns for global reset to finish
