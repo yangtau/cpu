@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="C:/Users/qyang/Code/arch-lab/lab3/PPCPU/TEST_CPU_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="TEST_CPU" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="9" />
+   <wvobject fp_name="/TEST_CPU/PC" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">PC[31:0]</obj_property>
+      <obj_property name="ObjectShortName">PC[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TEST_CPU/IF_Inst" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">IF_Inst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">IF_Inst[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TEST_CPU/ID_Inst" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ID_Inst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ID_Inst[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TEST_CPU/EXE_Alu" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">EXE_Alu[31:0]</obj_property>
+      <obj_property name="ObjectShortName">EXE_Alu[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TEST_CPU/MEM_Alu" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">MEM_Alu[31:0]</obj_property>
+      <obj_property name="ObjectShortName">MEM_Alu[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TEST_CPU/WB_Alu" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">WB_Alu[31:0]</obj_property>
+      <obj_property name="ObjectShortName">WB_Alu[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TEST_CPU/Clock" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">Clock</obj_property>
+      <obj_property name="ObjectShortName">Clock</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TEST_CPU/Resetn" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">Resetn</obj_property>
+      <obj_property name="ObjectShortName">Resetn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TEST_CPU/uut/ID_STAGE/stall_en" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">stall_en</obj_property>
+      <obj_property name="ObjectShortName">stall_en</obj_property>
+      <obj_property name="label">stall_en</obj_property>
+   </wvobject>
+</wave_config>
