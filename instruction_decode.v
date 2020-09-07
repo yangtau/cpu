@@ -24,6 +24,7 @@ module instruction_decode(pc4,inst,
                           exe_rd, exe_wreg,
                           mem_rd, mem_wreg,
                           wb_rd, wb_wreg,
+                          exe_m2reg,
                           stall_en,
                           alu_a_select, alu_b_select,
                           rsrtequ,id_wreg,id_rn,id_wz
@@ -36,6 +37,8 @@ input wire [4:0] exe_rd; // 处于mem阶段的指令的目标寄存器
 input wire [4:0] wb_rd; // 处于wb阶段的指令的目标寄存器
 input wire [4:0] mem_rd; // 处于mem阶段的指令的目标寄存器
 input wire wb_wreg, mem_wreg, exe_wreg; // 上两者的写信号
+
+input wire exe_m2reg;
 
 output wire stall_en;
 output wire [1:0] alu_a_select, alu_b_select;
@@ -65,6 +68,7 @@ Control_Unit cu(rsrtequ,func,
                 rs, rt,
                 mem_rd, mem_wreg,
                 exe_rd, exe_wreg,
+                exe_m2reg,
                 stall_en,
                 alu_a_select, alu_b_select,
                 sext,pcsource,id_wz);

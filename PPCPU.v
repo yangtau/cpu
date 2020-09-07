@@ -63,7 +63,9 @@ instruction_register IR(
 instruction_decode ID_STAGE (id_pc4, ID_Inst,
                              wdi, Clock, Resetn, bpc, jpc, pcsource,
                              id_m2reg, id_wmem, id_aluc, id_a, id_b, id_imm,
-                             exe_rn, exe_wreg, mem_rn, mem_wreg, wb_rn, wb_wreg, stall,
+                             exe_rn, exe_wreg, mem_rn, mem_wreg, wb_rn, wb_wreg, 
+                             exe_m2reg,
+                             stall,
                              id_alu_a_select, id_alu_b_select,
                              mem_z , id_wreg,  id_rn,  id_wz);
 

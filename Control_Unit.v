@@ -23,6 +23,7 @@ module Control_Unit(rsrtequ,func,
                     rs1, rs2, // rs, st
                     mem_rd, mem_wreg,
                     exe_rd, exe_wreg,
+                    exe_m2reg,
                     stall_en,
                     alu_a_select, alu_b_select,
                     sext,pcsource,wz
@@ -35,6 +36,7 @@ input wire [4:0] rs1, rs2; // 译码阶段需要读的寄存器
 input wire [4:0] exe_rd; // 处于wb阶段的指令的目标寄存器
 input wire [4:0] mem_rd; // 处于mem阶段的指令的目标寄存器
 input wire exe_wreg, mem_wreg; // 上两者的写信号
+input wire exe_m2reg;
 
 output wire stall_en;
 output wire [1:0] alu_a_select, alu_b_select;
@@ -88,8 +90,6 @@ assign sext=i_addi|i_lw|i_sw|i_beq|i_bne;//为1时符号拓展，否则零拓展
 assign wmem=i_sw;//存储器写信号：为1时写存储器，否则不写
 assign wz=i_beq|i_bne;
 
-// TODO:
-assign stall_en = 0;
 
 /*
 mem 和 wb 同时数据相关时，优先选择 mem 中的数据
@@ -109,6 +109,11 @@ assign alu_b_select = (aluimm? 2'b01:
                         (rs2_is_reg && mem_wreg && (mem_rd == rs2) ? 2'b11 :
                          2'b00
                         )));
+
+// exe 阶段正在执行 load 指令，暂停流水线
+assign stall_en = exe_m2reg && ((rs1_is_reg && exe_wreg && (exe_rd == rs1)) || (rs2_is_reg && exe_wreg && (exe_rd == rs2)));
+
+
 
 always @(rsrtequ or op or func)
 case (op)
