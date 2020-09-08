@@ -85,5 +85,6 @@ xlnx_auto_0_xdb/
 xst/
 _ngo/
 _xmsgs/
+netgen/
 
 # End of https://www.toptal.com/developers/gitignore/api/xilinxise,visualstudiocode

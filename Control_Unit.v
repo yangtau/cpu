@@ -24,9 +24,14 @@ module Control_Unit(rsrtequ,func,
                     mem_rd, mem_wreg,
                     exe_rd, exe_wreg,
                     exe_m2reg,
+                    exe_is_jump,
+                    exe_is_beq,
+                    exe_is_bne,
+                    mem_branch,
                     stall_en,
                     alu_a_select, alu_b_select,
-                    sext,pcsource,wz
+                    sext,pcsource,wz,
+                    is_jump, is_beq, is_bne
                    );
 input rsrtequ; 		//判断ALU输出结果是否为0：if(r=0)rsrtequ=1；
 input [5:0] func,op;		//指令中相应控制码字段
@@ -37,12 +42,15 @@ input wire [4:0] exe_rd; // 处于wb阶段的指令的目标寄存器
 input wire [4:0] mem_rd; // 处于mem阶段的指令的目标寄存器
 input wire exe_wreg, mem_wreg; // 上两者的写信号
 input wire exe_m2reg;
+input wire exe_is_jump, exe_is_beq, exe_is_bne;
+input wire mem_branch;
 
 output wire stall_en;
 output wire [1:0] alu_a_select, alu_b_select;
 output wreg,m2reg,wmem,regrt,sext,wz;		//wz为z的选择信号，
 output [2:0] aluc;		//ALU控制码
 output [1:0] pcsource;		//PC多路选择器控制码
+output is_jump, is_bne, is_beq;
 
 reg [2:0] aluc;
 reg [1:0] pcsource;
@@ -81,20 +89,24 @@ wire rs2_is_reg = i_add|i_and|i_and|i_or|i_xor|i_srl|i_sll|i_sw|i_beq|i_bne;
 wire shift=i_sll|i_srl;//ALUa数据输入选择：为1时ALUa输入端使用移位位数字段inst[19:15]
 wire aluimm=i_addi|i_andi|i_ori|i_xori|i_lw|i_sw;//ALUb数据输入选择：为1时ALUb输入端使用立即数
 
+wire discard_w =  exe_is_jump | mem_branch | stall_en;
 
 ////////////////////////////////////////////控制信号的生成/////////////////////////////////////////////////////////
-assign wreg=i_add|i_and|i_or|i_xor|i_sll|i_srl|i_addi|i_andi|i_ori|i_xori|i_lw;		//寄存器写信号
+assign wreg=(i_add|i_and|i_or|i_xor|i_sll|i_srl|i_addi|i_andi|i_ori|i_xori|i_lw) & (~discard_w)  ;		//寄存器写信号
 assign regrt=i_addi|i_andi|i_ori|i_xori|i_lw;    //regrt为1时目的寄存器是rt，否则为rd
 assign m2reg=i_lw;  //运算结果写回寄存器：为1时将存储器数据写入寄存器，否则将ALU结果写入寄存器
 assign sext=i_addi|i_lw|i_sw|i_beq|i_bne;//为1时符号拓展，否则零拓展
-assign wmem=i_sw;//存储器写信号：为1时写存储器，否则不写
-assign wz=i_beq|i_bne;
+assign wmem=i_sw&(~discard_w);//存储器写信号：为1时写存储器，否则不写
+assign wz=(i_beq|i_bne)&(~discard_w);
 
+assign is_jump = i_j;
+assign is_beq = i_beq;
+assign is_bne = i_bne;
 
 /*
 mem 和 wb 同时数据相关时，优先选择 mem 中的数据
 因为 mem 中的结果是最新的结果
-
+ 
 !!数据冒险检测在 ID 阶段，所以使用 mem 的数据应该对应 exe 的检测结果
 即检查的内容需要前置一个阶段
 */
@@ -110,8 +122,11 @@ assign alu_b_select = (aluimm? 2'b01:
                          2'b00
                         )));
 
-// exe 阶段正在执行 load 指令，暂停流水线
-assign stall_en = exe_m2reg && ((rs1_is_reg && exe_wreg && (exe_rd == rs1)) || (rs2_is_reg && exe_wreg && (exe_rd == rs2)));
+// exe 阶段正在执行 load 指令且数据冒险，暂停流水线
+// 或者 exe 阶段是 beq/bnq 指令
+assign stall_en = (exe_m2reg & ((rs1_is_reg & exe_wreg & (exe_rd == rs1)) | (rs2_is_reg & exe_wreg & (exe_rd == rs2))))
+       | exe_is_bne | exe_is_beq;
+
 
 
 

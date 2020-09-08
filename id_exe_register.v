@@ -19,8 +19,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module id_exe_register(clk,clrn,
-                       lock_write, // stall 锁住写信号，消除指令的影响
                        id_wreg,id_m2reg,id_wmem,id_aluc,id_alu_b_select,id_a,id_b,id_imm,id_rn,id_alu_a_select,id_wz,
+                       id_is_beq, id_is_bne, id_is_jump,
+                       exe_is_beq, exe_is_bne, exe_is_jump,
                        exe_wreg,exe_m2reg,exe_wmem,exe_aluc,exe_alu_b_select,exe_a,exe_b,exe_imm,exe_rn,exe_alu_a_select,exe_wz
                       );
 input [31:0] id_a,id_b,id_imm;
@@ -28,7 +29,10 @@ input [4:0] id_rn;
 input [2:0] id_aluc;
 input id_wreg,id_m2reg,id_wmem,id_wz;
 input [1:0] id_alu_b_select,id_alu_a_select;
-input clk,clrn, lock_write;
+input clk,clrn;
+input id_is_beq, id_is_bne, id_is_jump;
+
+output reg exe_is_beq, exe_is_bne, exe_is_jump;
 
 output reg [31:0] exe_a,exe_b,exe_imm;
 output reg [4:0] exe_rn;
@@ -53,11 +57,9 @@ always @(posedge clk or negedge clrn) begin
         exe_alu_a_select <= 0;
         exe_alu_b_select <= 0;
         exe_wz <= 0;
-    end
-    else if (lock_write) begin
-        exe_wreg <= 0;
-        exe_wz <= 0;
-        exe_wmem <= 0;
+        exe_is_jump <= 0;
+        exe_is_beq <= 0;
+        exe_is_bne <= 0;
     end
     else begin
         exe_a <= id_a;
@@ -73,6 +75,10 @@ always @(posedge clk or negedge clrn) begin
         exe_m2reg <= id_m2reg;
         exe_alu_a_select <= id_alu_a_select;
         exe_alu_b_select <= id_alu_b_select;
+
+        exe_is_jump <= id_is_jump;
+        exe_is_beq <= id_is_beq;
+        exe_is_bne <= id_is_bne;
     end
 end
 

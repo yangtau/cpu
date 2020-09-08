@@ -25,9 +25,14 @@ module instruction_decode(pc4,inst,
                           mem_rd, mem_wreg,
                           wb_rd, wb_wreg,
                           exe_m2reg,
+                          exe_is_jump,
+                          exe_is_beq,
+                          exe_is_bne,
+                          mem_branch,
                           stall_en,
                           alu_a_select, alu_b_select,
-                          rsrtequ,id_wreg,id_rn,id_wz
+                          rsrtequ,id_wreg,id_rn,id_wz,
+                          id_is_jump, id_is_beq, id_is_bne
                          );
 input [31:0] pc4,inst,wdi;		//pc4-PC值用于计算jpc；inst-读取的指令；wdi-向寄存器写入的数据
 input clk,clrn;		//clk-时钟信号；clrn-复位信号；
@@ -39,7 +44,9 @@ input wire [4:0] mem_rd; // 处于mem阶段的指令的目标寄存器
 input wire wb_wreg, mem_wreg, exe_wreg; // 上两者的写信号
 
 input wire exe_m2reg;
+input wire exe_is_jump, exe_is_beq, exe_is_bne, mem_branch;
 
+output id_is_jump, id_is_beq, id_is_bne;
 output wire stall_en;
 output wire [1:0] alu_a_select, alu_b_select;
 
@@ -69,9 +76,14 @@ Control_Unit cu(rsrtequ,func,
                 mem_rd, mem_wreg,
                 exe_rd, exe_wreg,
                 exe_m2reg,
+                exe_is_jump,
+                exe_is_beq,
+                exe_is_bne,
+                mem_branch,
                 stall_en,
                 alu_a_select, alu_b_select,
-                sext,pcsource,id_wz);
+                sext,pcsource,id_wz,
+                id_is_jump, id_is_beq, id_is_bne);
 
 // 寄存器堆，有32个32位的寄存器，0号寄存器恒为0；
 // 在下升沿将数据写入寄存器
