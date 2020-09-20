@@ -18,7 +18,7 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
-module Control_Unit(rsrtequ,func,
+module Control_Unit(func,
                     op,wreg,m2reg,wmem,aluc,regrt,
                     rs1, rs2, // rs, st
                     mem_rd, mem_wreg,
@@ -31,10 +31,9 @@ module Control_Unit(rsrtequ,func,
                     wb_branch,
                     stall_en,
                     alu_a_select, alu_b_select,
-                    sext,pcsource,wz,
+                    sext,pcsource,
                     is_jump, is_beq, is_bne
                    );
-input rsrtequ; 		//判断ALU输出结果是否为0：if(r=0)rsrtequ=1；
 input [5:0] func,op;		//指令中相应控制码字段
 
 // 用于 stall 信号生成
@@ -48,7 +47,7 @@ input wire mem_branch,wb_branch; // mem 阶段判断应当跳转
 
 output wire stall_en;
 output wire [1:0] alu_a_select, alu_b_select;
-output wreg,m2reg,wmem,regrt,sext,wz;		//wz为z的选择信号，
+output wreg,m2reg,wmem,regrt,sext;
 output reg [2:0] aluc;		//ALU控制码
 output wire [1:0] pcsource;		//PC多路选择器控制码
 output is_jump, is_bne, is_beq;
@@ -95,7 +94,6 @@ assign regrt=i_addi|i_andi|i_ori|i_xori|i_lw;    //regrt为1时目的寄存器�
 assign m2reg=i_lw;  //运算结果写回寄存器：为1时将存储器数据写入寄存器，否则将ALU结果写入寄存器
 assign sext=i_addi|i_lw|i_sw|i_beq|i_bne;//为1时符号拓展，否则零拓展
 assign wmem=i_sw&(~discard_w);//存储器写信号：为1时写存储器，否则不写
-assign wz=(i_beq|i_bne)&(~discard_w);
 
 assign is_jump = i_j;
 assign is_beq = i_beq;

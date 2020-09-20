@@ -34,7 +34,7 @@ input clk,clrn;
 input [31:0] exe_bpc;
 output reg [31:0] mem_alu,mem_b;
 output reg [4:0] mem_rn;
-output reg mem_wreg,mem_m2reg,mem_wmem;		//mem_z为从寄存器输出的EXE级输入信号-exe_z
+output reg mem_wreg,mem_m2reg,mem_wmem;		//EXE级输入信号-exe_z
 output reg mem_branch;
 output reg [31:0] mem_bpc;
 

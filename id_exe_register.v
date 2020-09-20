@@ -19,14 +19,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module id_exe_register(clk,clrn,
-                       id_wreg,id_m2reg,id_wmem,id_aluc,id_alu_b_select,id_a,id_b,id_imm,id_rn,id_alu_a_select,id_wz,
+                       id_wreg,id_m2reg,id_wmem,id_aluc,id_alu_b_select,id_a,id_b,id_imm,id_rn,id_alu_a_select,
                        id_is_beq, id_is_bne, id_is_jump, id_bpc,
                        exe_is_beq, exe_is_bne, exe_is_jump, exe_bpc,
-                       exe_wreg,exe_m2reg,exe_wmem,exe_aluc,exe_alu_b_select,exe_a,exe_b,exe_imm,exe_rn,exe_alu_a_select,exe_wz);
+                       exe_wreg,exe_m2reg,exe_wmem,exe_aluc,exe_alu_b_select,exe_a,exe_b,exe_imm,exe_rn,exe_alu_a_select);
 input [31:0] id_a,id_b,id_imm;
 input [4:0] id_rn;
 input [2:0] id_aluc;
-input id_wreg,id_m2reg,id_wmem,id_wz;
+input id_wreg,id_m2reg,id_wmem;
 input [1:0] id_alu_b_select,id_alu_a_select;
 input clk,clrn;
 input id_is_beq, id_is_bne, id_is_jump;
@@ -38,7 +38,7 @@ output reg exe_is_beq, exe_is_bne, exe_is_jump;
 output reg [31:0] exe_a,exe_b,exe_imm;
 output reg [4:0] exe_rn;
 output reg [2:0] exe_aluc;
-output reg exe_wreg,exe_m2reg,exe_wmem,exe_wz;
+output reg exe_wreg,exe_m2reg,exe_wmem;
 output reg [1:0] exe_alu_a_select,exe_alu_b_select;
 
 //请在下方补充代码以完成流水线寄存器
@@ -57,7 +57,6 @@ always @(posedge clk or negedge clrn) begin
         exe_wmem <= 0;
         exe_alu_a_select <= 0;
         exe_alu_b_select <= 0;
-        exe_wz <= 0;
         exe_is_jump <= 0;
         exe_is_beq <= 0;
         exe_is_bne <= 0;
@@ -71,7 +70,6 @@ always @(posedge clk or negedge clrn) begin
         exe_aluc <= id_aluc;
 
         exe_wreg <= id_wreg;
-        exe_wz <= id_wz;
         exe_wmem <= id_wmem;
 
         exe_m2reg <= id_m2reg;

@@ -18,14 +18,13 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
-module exe_mem_register_withWZ(exe_z, exe_wz,
+module exe_mem_register_withWZ(exe_z,
                                clk, clrn,
                                exe_wreg, exe_m2reg, exe_wmem, exe_alu, exe_b, exe_rn,
                                exe_is_beq, exe_is_bne, exe_bpc,
                                mem_branch, mem_bpc,
-                               mem_wreg, mem_m2reg, mem_wmem, mem_alu, mem_b, mem_rn, mem_z
-                              );
-input exe_z, exe_wz;
+                               mem_wreg, mem_m2reg, mem_wmem, mem_alu, mem_b, mem_rn);
+input exe_z;
 input clk, clrn;
 input exe_wreg, exe_m2reg, exe_wmem;
 input [31:0] exe_alu, exe_b;
@@ -33,15 +32,12 @@ input [4:0] exe_rn;
 input exe_is_bne, exe_is_beq;
 input [31:0] exe_bpc;
 
-output mem_wreg, mem_m2reg, mem_wmem, mem_z, mem_branch;
+output mem_wreg, mem_m2reg, mem_wmem, mem_branch;
 output [31:0] mem_bpc;
 output [31:0] mem_alu, mem_b;
 output [4:0] mem_rn;
 
 wire branch = (exe_is_beq&exe_z) | (exe_is_bne&~exe_z);
-
-//根据exe_wz信号确定是否写exe_mem寄存器的z信号，wz有效时写传递进来的exe_z，无效时常写0；
-dff reg_z (.d(exe_z),.clk(clk),.clrn(~exe_wz),.q(mem_z));
 
 exe_mem_register EXE_MEM (.clk(clk), .clrn(clrn),
                           .branch(branch),
