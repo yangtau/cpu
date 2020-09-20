@@ -25,16 +25,13 @@ output [31:0] inst;
 wire [31:0] rom [0:63];
 
 assign rom[6'h00]=32'h00000000;
-
-// op func imm rd rs rt
-assign rom[6'h01]=32'b000000_000001_00000_00001_00010_00011; // add r1, r2, r3 # r1 = 0x5
-assign rom[6'h02]=32'b000001_000001_00000_00100_00001_00101; // and r4, r1, r5 # r4 = 0x5
-assign rom[6'h03]=32'b000001_000010_00000_00110_00111_00001; // or r6, r7, r1  # r6 =
-assign rom[6'h04]=32'b000101_000000_00000_01010_00001_01000; // addi r8, r1, 0x000a (addi rt, rs, imm)
-assign rom[6'h05]=32'b001101_111111_11111_10101_01000_00001; // load r1, 0xfff5(r8) (load rt, offset(rs))
-assign rom[6'h06]=32'b000010_000011_00010_01001_00000_00001; // sll r9, r1, 0x02
-assign rom[6'h07]=32'b001110_000000_00001_00111_00001_01001; // store r9, 0x0027(r1)
-
+assign rom[6'h01]=32'h00100443; // add r1, r2, r3 # r1 = 0x5
+assign rom[6'h02]=32'h04101025; // and r4, r1, r5 # r4 = 0x5
+assign rom[6'h03]=32'h042018e1; // or r6, r7, r1  # r6 = 0x7
+assign rom[6'h04]=32'h14002828; // addi r8, r1, 0xa # r8 = 0xf 
+assign rom[6'h05]=32'h37ffd501; // load r1, 0xfff5(r8) # r1 = m[0x4] = 0x4
+assign rom[6'h06]=32'h08312401; // sll r9, r1, 0x02 # r9 = 0x10 
+assign rom[6'h07]=32'h38006c29; // store r9, 0x0027(r1)
 assign rom[6'h08]=32'h00000000;
 assign rom[6'h09]=32'h00000000;
 assign rom[6'h0A]=32'h00000000;
