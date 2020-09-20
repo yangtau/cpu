@@ -29,6 +29,7 @@ module instruction_decode(pc4,inst,
                           exe_is_beq,
                           exe_is_bne,
                           mem_branch,
+                          wb_branch,
                           stall_en,
                           alu_a_select, alu_b_select,
                           rsrtequ,id_wreg,id_rn,id_wz,
@@ -44,7 +45,7 @@ input wire [4:0] mem_rd; // 处于mem阶段的指令的目标寄存器
 input wire wb_wreg, mem_wreg, exe_wreg; // 上两者的写信号
 
 input wire exe_m2reg;
-input wire exe_is_jump, exe_is_beq, exe_is_bne, mem_branch;
+input wire exe_is_jump, exe_is_beq, exe_is_bne, mem_branch, wb_branch;
 
 output id_is_jump, id_is_beq, id_is_bne;
 output wire stall_en;
@@ -80,10 +81,11 @@ Control_Unit cu(rsrtequ,func,
                 exe_is_beq,
                 exe_is_bne,
                 mem_branch,
+                wb_branch,
                 stall_en,
                 alu_a_select, alu_b_select,
                 sext,pcsource,id_wz,
-                id_is_jump, id_is_beq, id_is_bne);
+                id_is_jump, id_is_beq, id_is_bne, wpc);
 
 // 寄存器堆，有32个32位的寄存器，0号寄存器恒为0；
 // 在下升沿将数据写入寄存器

@@ -20,10 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 module id_exe_register(clk,clrn,
                        id_wreg,id_m2reg,id_wmem,id_aluc,id_alu_b_select,id_a,id_b,id_imm,id_rn,id_alu_a_select,id_wz,
-                       id_is_beq, id_is_bne, id_is_jump,
-                       exe_is_beq, exe_is_bne, exe_is_jump,
-                       exe_wreg,exe_m2reg,exe_wmem,exe_aluc,exe_alu_b_select,exe_a,exe_b,exe_imm,exe_rn,exe_alu_a_select,exe_wz
-                      );
+                       id_is_beq, id_is_bne, id_is_jump, id_bpc,
+                       exe_is_beq, exe_is_bne, exe_is_jump, exe_bpc,
+                       exe_wreg,exe_m2reg,exe_wmem,exe_aluc,exe_alu_b_select,exe_a,exe_b,exe_imm,exe_rn,exe_alu_a_select,exe_wz);
 input [31:0] id_a,id_b,id_imm;
 input [4:0] id_rn;
 input [2:0] id_aluc;
@@ -31,7 +30,9 @@ input id_wreg,id_m2reg,id_wmem,id_wz;
 input [1:0] id_alu_b_select,id_alu_a_select;
 input clk,clrn;
 input id_is_beq, id_is_bne, id_is_jump;
+input [31:0] id_bpc;
 
+output reg [31:0] exe_bpc;
 output reg exe_is_beq, exe_is_bne, exe_is_jump;
 
 output reg [31:0] exe_a,exe_b,exe_imm;
@@ -60,6 +61,7 @@ always @(posedge clk or negedge clrn) begin
         exe_is_jump <= 0;
         exe_is_beq <= 0;
         exe_is_bne <= 0;
+        exe_bpc <= 0;
     end
     else begin
         exe_a <= id_a;
@@ -79,6 +81,7 @@ always @(posedge clk or negedge clrn) begin
         exe_is_jump <= id_is_jump;
         exe_is_beq <= id_is_beq;
         exe_is_bne <= id_is_bne;
+        exe_bpc <= id_bpc;
     end
 end
 

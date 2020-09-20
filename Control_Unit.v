@@ -28,6 +28,7 @@ module Control_Unit(rsrtequ,func,
                     exe_is_beq,
                     exe_is_bne,
                     mem_branch,
+                    wb_branch,
                     stall_en,
                     alu_a_select, alu_b_select,
                     sext,pcsource,wz,
@@ -43,17 +44,14 @@ input wire [4:0] mem_rd; // 处于mem阶段的指令的目标寄存器
 input wire exe_wreg, mem_wreg; // 上两者的写信号
 input wire exe_m2reg;
 input wire exe_is_jump, exe_is_beq, exe_is_bne;
-input wire mem_branch;
+input wire mem_branch,wb_branch; // mem 阶段判断应当跳转
 
 output wire stall_en;
 output wire [1:0] alu_a_select, alu_b_select;
 output wreg,m2reg,wmem,regrt,sext,wz;		//wz为z的选择信号，
-output [2:0] aluc;		//ALU控制码
-output [1:0] pcsource;		//PC多路选择器控制码
+output reg [2:0] aluc;		//ALU控制码
+output wire [1:0] pcsource;		//PC多路选择器控制码
 output is_jump, is_bne, is_beq;
-
-reg [2:0] aluc;
-reg [1:0] pcsource;
 
 wire i_add,i_and,i_or,i_xor,i_sll,i_srl;            //寄存器运算标志
 wire i_addi,i_andi,i_ori,i_xori;		//立即数运算标志
@@ -89,7 +87,7 @@ wire rs2_is_reg = i_add|i_and|i_and|i_or|i_xor|i_srl|i_sll|i_sw|i_beq|i_bne;
 wire shift=i_sll|i_srl;//ALUa数据输入选择：为1时ALUa输入端使用移位位数字段inst[19:15]
 wire aluimm=i_addi|i_andi|i_ori|i_xori|i_lw|i_sw;//ALUb数据输入选择：为1时ALUb输入端使用立即数
 
-wire discard_w =  exe_is_jump | mem_branch | stall_en;
+wire discard_w =  exe_is_jump | mem_branch | wb_branch | stall_en;
 
 ////////////////////////////////////////////控制信号的生成/////////////////////////////////////////////////////////
 assign wreg=(i_add|i_and|i_or|i_xor|i_sll|i_srl|i_addi|i_andi|i_ori|i_xori|i_lw) & (~discard_w)  ;		//寄存器写信号
@@ -128,94 +126,72 @@ assign stall_en = (exe_m2reg & ((rs1_is_reg & exe_wreg & (exe_rd == rs1)) | (rs2
        | exe_is_bne | exe_is_beq;
 
 
+assign pcsource = (mem_branch ? 2'b01 :
+                   (i_j&(~wb_branch) ? 2'b10 :
+                    2'b00
+                   ));
 
-
-always @(rsrtequ or op or func)
+always @(op or func)
 case (op)
     6'b000000: begin
         aluc<=3'b000;
-        pcsource<=2'b00;
-    end		//+; pc=pc+4
+    end		//+;
     6'b000001:
     case (func[5:0])
         6'b000001: begin
             aluc<=3'b001;
-            pcsource<=2'b00;
-        end		//and; pc=pc+4
+        end		//and;
         6'b000010: begin
             aluc<=3'b010;
-            pcsource<=2'b00;
-        end		//or; pc=pc+4
+        end		//or;
         6'b000100: begin
             aluc<=3'b011;
-            pcsource<=2'b00;
-        end		//xor; pc=pc+4
+        end		//xor;
         default: begin
             aluc<=3'b111;
-            pcsource<=2'b11;
         end
     endcase
     6'b000010:
     case (func[5:0])
         6'b000010: begin
             aluc<=3'b100;
-            pcsource<=2'b00;
-        end		//srl; pc=pc+4
+        end		//srl;
         6'b000011: begin
             aluc<=3'b101;
-            pcsource<=2'b00;
-        end		//sll; pc=pc+4
+        end		//sll;
         default: begin
             aluc<=3'b111;
-            pcsource<=2'b11;
         end
     endcase
     6'b000101: begin
         aluc<=3'b000;
-        pcsource<=2'b00;
-    end		//addi; pc=pc+4
+    end		//addi;
     6'b001001: begin
         aluc<=3'b001;
-        pcsource<=2'b00;
-    end		//andi; pc=pc+4
+    end		//andi;
     6'b001010: begin
         aluc<=3'b010;
-        pcsource<=2'b00;
-    end		//ori; pc=pc+4
+    end		//ori;
     6'b001100: begin
         aluc<=3'b011;
-        pcsource<=2'b00;
-    end		//xori; pc=pc+4
-
+    end		//xori;
     6'b001101: begin
         aluc<=3'b000;
-        pcsource<=2'b00;
-    end		//load; pc=pc+4
+    end
     6'b001110: begin
         aluc<=3'b000;
-        pcsource<=2'b00;
-    end		//store; pc=pc+4
+    end
     6'b001111: begin
-        aluc<=3'b110;
-        if(rsrtequ)
-            pcsource<=2'b01;
-        else
-            pcsource<=2'b00;
-    end		//beq; pc=bpc
+        aluc<=3'b110;        
+    end
     6'b010000: begin
         aluc<=3'b110;
-        if(!rsrtequ)
-            pcsource<=2'b01;
-        else
-            pcsource<=2'b00;
-    end		//bne; pc=bpc
+    end
     6'b010010: begin
         aluc<=3'b111;
-        pcsource<=2'b10;
-    end		//jump; pc=jpc
+    end
     default: begin
         aluc<=3'b111;
-        pcsource<=2'b11;
     end
 endcase
 
