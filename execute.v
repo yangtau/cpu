@@ -27,7 +27,7 @@ input [31:0] exe_a,exe_b,exe_imm;
 input [31:0] mem_forward, wb_alu_forward, wb_mo_forward; // 前推数据
 input wb_m2reg;
 input [2:0] exe_aluc; 	//ALU控制码
-input [1:0] exe_a_select,exe_b_select;  //ALU输入操作数的多路选择器
+input [1:0] exe_a_select,exe_b_select;  // ALU输入操作数的选择信号
 output [31:0] exe_alu;  //alu操作输出
 output z;  // zero flag
 
@@ -37,6 +37,9 @@ assign sa={27'b0,exe_imm[9:5]};//移位位数的生成
 
 wire [31:0] wb_data;
 
+// wb_alu_forward 是 WB 阶段ALU执行结果的前推
+// wb_mo_forward 是读内存的结果
+// 需要通过 wb_m2reg 信号来判断所需数据是alu的结果还是读内存的结果
 mux32_2_1 wb_data_mux(wb_alu_forward, wb_mo_forward, wb_m2reg, wb_data);
 
 mux32_4_1 alu_ina (exe_a,sa, mem_forward, wb_data,

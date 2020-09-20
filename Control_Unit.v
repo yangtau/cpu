@@ -39,7 +39,7 @@ input wire exe_wreg, mem_wreg; // 上两者的写信号
 input wire exe_m2reg;
 
 output wire stall_en;
-output wire [1:0] alu_a_select, alu_b_select;
+output wire [1:0] alu_a_select, alu_b_select; // alu 输入的选择信号
 output wreg,m2reg,wmem,regrt,sext,wz;		//wz为z的选择信号，
 output [2:0] aluc;		//ALU控制码
 output [1:0] pcsource;		//PC多路选择器控制码
