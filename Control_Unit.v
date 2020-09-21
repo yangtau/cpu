@@ -43,14 +43,16 @@ input wire [4:0] mem_rd; // 处于mem阶段的指令的目标寄存器
 input wire exe_wreg, mem_wreg; // 上两者的写信号
 input wire exe_m2reg;
 input wire exe_is_jump, exe_is_beq, exe_is_bne;
-input wire mem_branch,wb_branch; // mem 阶段判断应当跳转
+
+ // mem 阶段跳转信号, wb 阶段跳转信号
+input wire mem_branch,wb_branch;
 
 output wire stall_en;
 output wire [1:0] alu_a_select, alu_b_select;
 output wreg,m2reg,wmem,regrt,sext;
 output reg [2:0] aluc;		//ALU控制码
 output wire [1:0] pcsource;		//PC多路选择器控制码
-output is_jump, is_bne, is_beq;
+output is_jump, is_bne, is_beq; // 输出指令类型
 
 wire i_add,i_and,i_or,i_xor,i_sll,i_srl;            //寄存器运算标志
 wire i_addi,i_andi,i_ori,i_xori;		//立即数运算标志
@@ -86,7 +88,27 @@ wire rs2_is_reg = i_add|i_and|i_and|i_or|i_xor|i_srl|i_sll|i_sw|i_beq|i_bne;
 wire shift=i_sll|i_srl;//ALUa数据输入选择：为1时ALUa输入端使用移位位数字段inst[19:15]
 wire aluimm=i_addi|i_andi|i_ori|i_xori|i_lw|i_sw;//ALUb数据输入选择：为1时ALUb输入端使用立即数
 
-wire discard_w =  exe_is_jump | mem_branch | wb_branch | stall_en;
+// exe 阶段正在执行 load 指令且数据冒险，暂停流水线
+// 或者 exe 阶段是 beq/bnq 指令
+assign stall_en = (exe_m2reg & ((rs1_is_reg & exe_wreg & (exe_rd == rs1)) | (rs2_is_reg & exe_wreg & (exe_rd == rs2))))
+       | exe_is_bne | exe_is_beq;
+
+// 是否无效化写信号
+// exe 阶段是 jump,或者应该暂停流水线, 或者mem/wb阶段的branch指令需要跳转
+wire discard_w =  exe_is_jump | mem_branch | wb_branch | stall_en; 
+
+// mem 阶段的指令应该跳转,则在本条指令的pcsource 中输出信号
+// 如果是jump的情况,需要判断wb阶段是否需要跳转,如果需要,则要让当前的jump无效化
+assign pcsource = (mem_branch ? 2'b01 :
+                   (i_j&(~wb_branch) ? 2'b10 :
+                    2'b00
+                   ));
+
+assign is_jump = i_j;
+
+// 无效化 branch 指令
+assign is_beq = i_beq&(~discard_w);
+assign is_bne = i_bne&(~discard_w);
 
 ////////////////////////////////////////////控制信号的生成/////////////////////////////////////////////////////////
 assign wreg=(i_add|i_and|i_or|i_xor|i_sll|i_srl|i_addi|i_andi|i_ori|i_xori|i_lw) & (~discard_w)  ;		//寄存器写信号
@@ -95,9 +117,6 @@ assign m2reg=i_lw;  //运算结果写回寄存器：为1时将存储器数据写
 assign sext=i_addi|i_lw|i_sw|i_beq|i_bne;//为1时符号拓展，否则零拓展
 assign wmem=i_sw&(~discard_w);//存储器写信号：为1时写存储器，否则不写
 
-assign is_jump = i_j;
-assign is_beq = i_beq;
-assign is_bne = i_bne;
 
 /*
 mem 和 wb 同时数据相关时，优先选择 mem 中的数据
@@ -117,17 +136,6 @@ assign alu_b_select = (aluimm? 2'b01:
                         (rs2_is_reg && mem_wreg && (mem_rd == rs2) ? 2'b11 :
                          2'b00
                         )));
-
-// exe 阶段正在执行 load 指令且数据冒险，暂停流水线
-// 或者 exe 阶段是 beq/bnq 指令
-assign stall_en = (exe_m2reg & ((rs1_is_reg & exe_wreg & (exe_rd == rs1)) | (rs2_is_reg & exe_wreg & (exe_rd == rs2))))
-       | exe_is_bne | exe_is_beq;
-
-
-assign pcsource = (mem_branch ? 2'b01 :
-                   (i_j&(~wb_branch) ? 2'b10 :
-                    2'b00
-                   ));
 
 always @(op or func)
 case (op)
